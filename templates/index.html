@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <title>FaturAI</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FaturAI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}">
+  <script src="{{ url_for('static', filename='assets/js/functions-min.js') }}" defer></script>
+</head>
+
+<body>
+
+  <!-- notification for small viewports and landscape oriented smartphones -->
+  <div class="device-notification">
+    <a class="device-notification--logo" href="index.html">
+      <img src="{{ url_for('static', filename='assets/img/logo.png') }}" alt="FaturAI">
+      <p>FaturAI</p>
+    </a>
+    <p class="device-notification--message">Global has so much to offer that we must request you orient your device to
+      portrait or find a larger screen. You won't be disappointed.</p>
+  </div>
+
+  <div class="perspective effect-rotate-left">
+    <div class="container">
+      <div class="outer-nav--return"></div>
+      <div id="viewport" class="l-viewport">
+        <div class="l-wrapper">
+          <header class="header">
+            <a class="header--logo" href="#0">
+              <img src="{{ url_for('static', filename='assets/img/logo.png') }}" alt="Global">
+
+            </a>
+            <button class="header--cta cta">Bize Ulaşın</button>
+            <div class="header--nav-toggle">
+              <span></span>
+            </div>
+          </header>
+          <nav class="l-side-nav">
+            <ul class="side-nav">
+              <li class="is-active"><span>Ana Sayfa</span></li>
+              <li><span>Biz Kimiz</span></li>
+              <li><span>Ekibimiz</span></li>
+              <li><span>İletişim</span></li>
+              <!--<li><span>Daha </span></li> -->
+            </ul>
+          </nav>
+          <ul class="l-main-content main-content">
+            <li class="l-section section section--is-active">
+              <div class="intro">
+                <div class="intro--banner">
+                  <h1>Faturanı<br> Doğrulamak İçin<br>Şimdi Dene!</h1>
+
+
+                  <!-- FİLE YÜKLEME -->
+
+                  <label for="images" class="drop-container" id="dropcontainer">
+                    <span class="drop-title">Dosyayı Sürükle</span>
+                    veya
+                    <input type="file" id="images" accept="image/*" required>
+
+                  </label>
+                  <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                      document.getElementById('images').addEventListener('change', function (event) {
+                        var file = event.target.files[0];
+                        if (file) {
+                          var formData = new FormData();
+                          formData.append('file1', file);  // Dosyanın anahtar adı 'file1' olduğundan emin olun
+                  
+                          fetch('/predict', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                              'Accept': 'application/json'
+                            }
+                          })
+                          .then(response => response.json())
+                          .then(data => {
+                            if (data.error) {
+                              console.error('Hata:', data.error);
+                            } else {
+                              // Tahmin sonuçlarını konsolda göster
+                              console.log('Predicted Class:', data.predicted_class);
+                              console.log('Ensemble Score:', data.ensemble_score);
+                  
+                              // Ensemble Score 0.68 ile 0.71 arasında ise qr_hatasi.html sayfasına yönlendir
+                              if (data.ensemble_score >= 0.66 && data.ensemble_score <= 0.70) {
+                                window.location.href = '/qr_hatasi';  // Bu URL'yi yönlendirmek istediğiniz sayfa ile değiştirin
+                              } else if (data.ensemble_score >=0.97 && data.ensemble_score <=0.98) {
+                                window.location.href = '/bos_fatura';
+                              }
+                              else if (data.ensemble_score >=0.70 && data.ensemble_score <=0.78) {
+                                window.location.href = '/hatali_banka_isim';
+                              }
+                              window.location.href = data.redirect;
+                            }
+                          })
+                          .catch(error => {
+                            console.error('Hata:', error);
+                          });
+                        }
+                      });
+                    });
+                  </script>
+
+
+
+
+                  <!--
+
+
+                <button class="cta">Hire Us
+                  <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 118" style="enable-background:new 0 0 150 118;" xml:space="preserve">
+                  <g transform="translate(0.000000,118.000000) scale(0.100000,-0.100000)">
+                    <path d="M870,1167c-34-17-55-57-46-90c3-15,81-100,194-211l187-185l-565-1c-431,0-571-3-590-13c-55-28-64-94-18-137c21-20,33-20,597-20h575l-192-193C800,103,794,94,849,39c20-20,39-29,61-29c28,0,63,30,298,262c147,144,272,271,279,282c30,51,23,60-219,304C947,1180,926,1196,870,1167z"/>
+                  </g>
+                  </svg>
+                  <span class="btn-background"></span>
+                </button>
+                -->
+                  ""
+                  <img src="{{ url_for('static', filename='assets/img/introduction-visual.png') }}" alt="Welcome">
+                </div>
+                <div class="intro--options">
+                  <a>
+                    <h3>Yüksek Doğruluk</h3>
+                    <p>Faturalarınızı en ince ayrıntısına kadar analiz ediyor, hatasız sonuçlar sunuyoruz.</p>
+                  </a>
+                  <a>
+                    <h3>Hızlı Çözüm</h3>
+                    <p>Anında tespit, hızlı çözüm – zaman kaybetmeden doğruluğa ulaşın.</p>
+                  </a>
+                  <a>
+                    <h3>Kolay Ulaşım</h3>
+                    <p>Her yerden erişim, her zaman kontrol – faturalarınız elinizin altında.</p>
+                  </a>
+                </div>
+              </div>
+            </li>
+
+
+
+            <li class="l-section section">
+              <div class="about">
+                <div class="about--banner">
+                  <h2>Hakkımızda</h2>
+                  <p class="slider--item-description">Merhaba! Biz, Arvis Teknoloji'nin 15. proje ekibiyiz. <br>Bu
+                    süreçte yapay zeka ve görüntü işleme alanında kendimizi geliştiriyoruz.<br> Projemiz, "FaturAI"
+                    adını verdiğimiz, elektrik faturalarındaki hataları<br> ve anormallikleri tespit etmek üzerine
+                    yoğunlaşmış bir çalışma. <br>Amacımız, faturaları daha doğru ve güvenilir bir şekilde analiz
+                    ederek,<br> kullanıcıların karşılaşabileceği sorunları minimuma indirmek.<br>
+
+                    FaturAI, faturalarınızı kolayca tarayıp olası hataları<br> tespit eden bir sistem olarak tasarlandı.
+                    Hepimizin bir araya geldiği bu projede,<br> yenilikçi çözümler üreterek, yapay zekanın günlük
+                    hayatımıza<br> nasıl entegre olabileceğini göstermeye çalışıyoruz.<br>
+
+                    Bu yolculukta bizimle olduğunuz için teşekkür ederiz!<br><br> Birlikte daha akıllı çözümler üretmek
+                    için buradayız.<br><br>
+
+                    Sevgilerle,</p>
+
+                  <img src="{{ url_for('static', filename='assets/img/about-visual.png') }}">
+                </div>
+                <!--
+              <div class="about--options">
+                <a href="#0">
+                  <h3>Winners</h3>
+                </a>
+                <a href="#0">
+                  <h3>Philosophy</h3>
+                </a>
+                <a href="#0">
+                  <h3>History</h3>
+                </a>
+              </div>
+            </div>
+            -->
+            </li>
+
+
+
+
+
+
+            <li class="l-section section">
+              <div class="work">
+                <h2>EKİBİMİZ</h2>
+                <div class="work--lockup">
+                  <ul class="slider">
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/esrefemre.jpeg') }}" alt="Victory">
+                        </div>
+                        <p class="slider--item-title">Eşref Emre Bayrakçı</p>
+                        <p class="slider--item-description">Bilgisayar Mühendisi</p>
+                      </a>
+                    </li>
+
+
+
+                    <li class="slider--item slider--item-center">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/cennetsude.jpeg') }}"
+                            alt="Metiew and Smith">
+                        </div>
+                        <p class="slider--item-title">Cennet Sude Arıkan</p>
+                        <p class="slider--item-description">Ekip Sözcüsü ve Ocr Uzmanı</p>
+                      </a>
+                    </li>
+
+
+
+
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/edaates.jpeg') }}"
+                            alt="Alex Nowak">
+                        </div>
+                        <p class="slider--item-title">Eda Ateş</p>
+                        <p class="slider--item-description">Görüntü İşleme Uzmanı</p>
+                      </a>
+                    </li>
+
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/kaan.jpeg') }}">
+                        </div>
+                        <p class="slider--item-title">Kaan Akkök</p>
+                        <p class="slider--item-description">Makine Öğrenimi Uzmanı</p>
+                      </a>
+                    </li>
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/furkan.jpeg') }}">
+                        </div>
+                        <p class="slider--item-title">Furkan Düzen</p>
+                        <p class="slider--item-description">Frontend Developer</p>
+                      </a>
+                    </li>
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/back.jpeg') }}">
+                        </div>
+                        <p class="slider--item-title">Özgür Örnek</p>
+                        <p class="slider--item-description">Görüntü İşleme Uzmanı</p>
+                      </a>
+                    </li>
+
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/ipek.png') }}">
+                        </div>
+                        <p class="slider--item-title">İpek Polat</p>
+                        <p class="slider--item-description">Ocr Uzmanı</p>
+                      </a>
+                    </li>
+
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/umut.jpeg') }}">
+                        </div>
+                        <p class="slider--item-title">Umut Kaan Kartaloğlu</p>
+                        <p class="slider--item-description">FullStack Developer</p>
+                      </a>
+                    </li>
+
+
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/yunus.jpeg') }}">
+                        </div>
+                        <p class="slider--item-title">Yunus Emre Karagöz</p>
+                        <p class="slider--item-description">Backend Ve Makine Öğrenimi Uzmanı</p>
+                      </a>
+                    </li>
+
+
+                    <li class="slider--item ">
+                      <a href="#0">
+                        <div class="slider--item-image">
+                          <img src="{{ url_for('static', filename='assets/img/pp/aleynap.jpeg') }}">
+                        </div>
+                        <p class="slider--item-title">Aleyna Polat</p>
+                        <p class="slider--item-description">Görüntü İşleme Uzmanı</p>
+                      </a>
+                    </li>
+
+
+                  </ul>
+                  <div class="slider--prev">
+                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 118"
+                      style="enable-background:new 0 0 150 118;" xml:space="preserve">
+                      <g transform="translate(0.000000,118.000000) scale(0.100000,-0.100000)">
+                        <path d="M561,1169C525,1155,10,640,3,612c-3-13,1-36,8-52c8-15,134-145,281-289C527,41,562,10,590,10c22,0,41,9,61,29
+                    c55,55,49,64-163,278L296,510h575c564,0,576,0,597,20c46,43,37,109-18,137c-19,10-159,13-590,13l-565,1l182,180
+                    c101,99,187,188,193,199c16,30,12,57-12,84C631,1174,595,1183,561,1169z" />
+                      </g>
+                    </svg>
+                  </div>
+                  <div class="slider--next">
+                    <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                      xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 118"
+                      style="enable-background:new 0 0 150 118;" xml:space="preserve">
+                      <g transform="translate(0.000000,118.000000) scale(0.100000,-0.100000)">
+                        <path
+                          d="M870,1167c-34-17-55-57-46-90c3-15,81-100,194-211l187-185l-565-1c-431,0-571-3-590-13c-55-28-64-94-18-137c21-20,33-20,597-20h575l-192-193C800,103,794,94,849,39c20-20,39-29,61-29c28,0,63,30,298,262c147,144,272,271,279,282c30,51,23,60-219,304C947,1180,926,1196,870,1167z" />
+                      </g>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+
+
+
+
+
+
+
+
+
+
+            <li class="l-section section">
+              <div class="contact">
+                <div class="contact--lockup">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d55782.341383980835!2d29.098061504202384!3d40.98432846019378!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46325534ef2b35af%3A0x5bdda8f0e05750b4!2sArvis%20Teknoloji%20San.%20Tic.%20A.%C5%9E.!5e1!3m2!1str!2str!4v1724188906976!5m2!1str!2str"
+                    width="800" height="600" style="border:0;" allowfullscreen="" loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                  <div class="modal">
+                    <div class="modal--information">
+                      <p>ArVis Teknoloji <br><br>Teknopark İstanbul, Sanayi Mah. Teknopark Bulvarı No:1/4C
+                        Pendik/İstanbul</p>
+                      <a href="mailto:info@arvis.com.tr">info@arvis.com.tr</a>
+                      <a href="tel:+905301227843">Tel No: +90 530 122 78 43</a>
+                    </div>
+                    <ul class="modal--options">
+                      <li><a
+                          href="https://www.google.com/maps/place/Arvis+Teknoloji+San.+Tic.+A.%C5%9E./@40.9843285,29.0980615,12810m/data=!3m2!1e3!4b1!4m6!3m5!1s0x46325534ef2b35af:0x5bdda8f0e05750b4!8m2!3d40.984271!4d29.139261!16s%2Fg%2F11pd31r_j7?entry=ttu">Adres</a>
+                      </li>
+                      <li><a href="tel:+905301227843">Telefon</a></li>
+                      <li><a href="mailto:info@arvis.com.tr">Mail</a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </li>
+
+
+
+            <li class="l-section section">
+              <div class="hire">
+                <h2>You want us to do</h2>
+
+                <form class="work-request">
+                  <div class="work-request--options">
+                    <span class="options-a">
+                      <input id="opt-1" type="checkbox" value="app design">
+                      <label for="opt-1">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 111"
+                          style="enable-background:new 0 0 150 111;" xml:space="preserve">
+                          <g transform="translate(0.000000,111.000000) scale(0.100000,-0.100000)">
+                            <path
+                              d="M950,705L555,310L360,505C253,612,160,700,155,700c-6,0-44-34-85-75l-75-75l278-278L550-5l475,475c261,261,475,480,475,485c0,13-132,145-145,145C1349,1100,1167,922,950,705z" />
+                          </g>
+                        </svg>
+                        App Design
+                      </label>
+                      <input id="opt-2" type="checkbox" value="graphic design">
+                      <label for="opt-2">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 111"
+                          style="enable-background:new 0 0 150 111;" xml:space="preserve">
+                          <g transform="translate(0.000000,111.000000) scale(0.100000,-0.100000)">
+                            <path
+                              d="M950,705L555,310L360,505C253,612,160,700,155,700c-6,0-44-34-85-75l-75-75l278-278L550-5l475,475c261,261,475,480,475,485c0,13-132,145-145,145C1349,1100,1167,922,950,705z" />
+                          </g>
+                        </svg>
+                        Graphic Design
+                      </label>
+                      <input id="opt-3" type="checkbox" value="motion design">
+                      <label for="opt-3">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 111"
+                          style="enable-background:new 0 0 150 111;" xml:space="preserve">
+                          <g transform="translate(0.000000,111.000000) scale(0.100000,-0.100000)">
+                            <path
+                              d="M950,705L555,310L360,505C253,612,160,700,155,700c-6,0-44-34-85-75l-75-75l278-278L550-5l475,475c261,261,475,480,475,485c0,13-132,145-145,145C1349,1100,1167,922,950,705z" />
+                          </g>
+                        </svg>
+                        Motion Design
+                      </label>
+                    </span>
+                    <span class="options-b">
+                      <input id="opt-4" type="checkbox" value="ux design">
+                      <label for="opt-4">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 111"
+                          style="enable-background:new 0 0 150 111;" xml:space="preserve">
+                          <g transform="translate(0.000000,111.000000) scale(0.100000,-0.100000)">
+                            <path
+                              d="M950,705L555,310L360,505C253,612,160,700,155,700c-6,0-44-34-85-75l-75-75l278-278L550-5l475,475c261,261,475,480,475,485c0,13-132,145-145,145C1349,1100,1167,922,950,705z" />
+                          </g>
+                        </svg>
+                        UX Design
+                      </label>
+                      <input id="opt-5" type="checkbox" value="webdesign">
+                      <label for="opt-5">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 111"
+                          style="enable-background:new 0 0 150 111;" xml:space="preserve">
+                          <g transform="translate(0.000000,111.000000) scale(0.100000,-0.100000)">
+                            <path
+                              d="M950,705L555,310L360,505C253,612,160,700,155,700c-6,0-44-34-85-75l-75-75l278-278L550-5l475,475c261,261,475,480,475,485c0,13-132,145-145,145C1349,1100,1167,922,950,705z" />
+                          </g>
+                        </svg>
+                        Webdesign
+                      </label>
+                      <input id="opt-6" type="checkbox" value="marketing">
+                      <label for="opt-6">
+                        <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 150 111"
+                          style="enable-background:new 0 0 150 111;" xml:space="preserve">
+                          <g transform="translate(0.000000,111.000000) scale(0.100000,-0.100000)">
+                            <path
+                              d="M950,705L555,310L360,505C253,612,160,700,155,700c-6,0-44-34-85-75l-75-75l278-278L550-5l475,475c261,261,475,480,475,485c0,13-132,145-145,145C1349,1100,1167,922,950,705z" />
+                          </g>
+                        </svg>
+                        Marketing
+                      </label>
+                    </span>
+                  </div>
+                  <div class="work-request--information">
+                    <div class="information-name">
+                      <input id="name" type="text" spellcheck="false">
+                      <label for="name">İsim</label>
+                    </div>
+                    <div class="information-email">
+                      <input id="email" type="email" spellcheck="false">
+                      <label for="email">E-Posta</label>
+                    </div>
+                  </div>
+                  <input type="submit" value="Send Request">
+                </form>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <ul class="outer-nav">
+      <li class="is-active">Ana Sayfa</li>
+      <li>Biz Kimiz</li>
+      <li>Ekibimiz</li>
+      <li>İletişim</li>
+      <!--<li>Bize Ulaşın</li> -->
+    </ul>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="assets/js/vendor/jquery-2.2.4.min.js"><\/script>')</script>
+  <script src="{{ url_for('static', filename='assets/js/functions-min.js') }}"></script>
+</body>
+
+</html>
